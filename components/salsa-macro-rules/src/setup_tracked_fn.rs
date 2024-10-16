@@ -98,7 +98,17 @@ macro_rules! setup_tracked_fn {
                     static $INTERN_CACHE: $zalsa::IngredientCache<$zalsa::interned::IngredientImpl<$Configuration>> =
                         $zalsa::IngredientCache::new();
 
-                    impl $zalsa::SalsaStructInDb for $InternedData<'_> {
+                    impl<$db_lt> $zalsa::SalsaStruct<$db_lt> for $InternedData<$db_lt> {
+                        fn new(db: &$db_lt dyn $zalsa::Database, id: $zalsa::Id) -> Self {
+                            let new = Self(id, std::marker::PhantomData);
+                            assert_eq!(db.zalsa().get_ingredient(new.0), Self::ingredient_index(db));
+                            new
+                        }
+
+                        fn ingredient_index(db: &$db_lt dyn $zalsa::Database) -> $zalsa::IngredientIndex {
+                            let ingredient = $Configuration::fn_ingredient_inner(db);
+                            $zalsa::Ingredient::ingredient_index(ingredient)
+                        }
                     }
 
                     impl $zalsa::interned::Configuration for $Configuration {
@@ -125,8 +135,14 @@ macro_rules! setup_tracked_fn {
 
             impl $Configuration {
                 fn fn_ingredient(db: &dyn $Db) -> &$zalsa::function::IngredientImpl<$Configuration> {
-                    $FN_CACHE.get_or_create(db.as_dyn_database(), || {
-                        <dyn $Db as $Db>::zalsa_db(db);
+                    <dyn $Db as $Db>::zalsa_db(db);
+                    Self::fn_ingredient_inner(db.as_dyn_database())
+                }
+
+                fn fn_ingredient_inner(
+                    db: &dyn $zalsa::Database
+                ) -> &$zalsa::function::IngredientImpl<$Configuration> {
+                    $FN_CACHE.get_or_create(db, || {
                         db.zalsa().add_or_lookup_jar_by_type(&$Configuration)
                     })
                 }

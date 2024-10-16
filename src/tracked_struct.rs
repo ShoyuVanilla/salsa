@@ -9,7 +9,7 @@ use crate::{
     key::{DatabaseKeyIndex, DependencyIndex},
     plumbing::ZalsaLocal,
     runtime::StampedValue,
-    salsa_struct::SalsaStructInDb,
+    salsa_struct::SalsaStruct,
     table::{memo::MemoTable, sync::SyncTable, Slot, Table},
     zalsa::{IngredientIndex, Zalsa},
     zalsa_local::QueryOrigin,
@@ -114,9 +114,9 @@ impl<C: Configuration> Jar for JarImpl<C> {
     }
 }
 
-pub trait TrackedStructInDb: SalsaStructInDb {
+pub trait TrackedStruct<'db>: SalsaStruct<'db> {
     /// Converts the identifier for this tracked struct into a `DatabaseKeyIndex`.
-    fn database_key_index(db: &dyn Database, id: Id) -> DatabaseKeyIndex;
+    fn database_key_index(db: &'db dyn Database, id: Id) -> DatabaseKeyIndex;
 }
 
 /// Created for each tracked struct.

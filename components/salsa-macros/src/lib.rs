@@ -44,6 +44,7 @@ mod input;
 mod interned;
 mod options;
 mod salsa_struct;
+mod supertype;
 mod tracked;
 mod tracked_fn;
 mod tracked_impl;
@@ -74,6 +75,11 @@ pub fn input(args: TokenStream, input: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn tracked(args: TokenStream, input: TokenStream) -> TokenStream {
     tracked::tracked(args, input)
+}
+
+#[proc_macro_attribute]
+pub fn supertype(args: TokenStream, input: TokenStream) -> TokenStream {
+    supertype::supertype(args, input)
 }
 
 #[proc_macro_derive(Update)]

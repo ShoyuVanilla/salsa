@@ -1,7 +1,7 @@
 use crossbeam::atomic::AtomicCell;
 
 use crate::{
-    tracked_struct::TrackedStructInDb,
+    tracked_struct::TrackedStruct,
     zalsa::ZalsaDatabase,
     zalsa_local::{QueryOrigin, QueryRevisions},
     AsDynDatabase as _, Database, DatabaseKeyIndex, Id,
@@ -17,7 +17,7 @@ where
     /// Used for explicit calls to `specify`, but not needed for pre-declared tracked struct fields.
     pub fn specify_and_record<'db>(&'db self, db: &'db C::DbView, key: Id, value: C::Output<'db>)
     where
-        C::Input<'db>: TrackedStructInDb,
+        C::Input<'db>: TrackedStruct<'db>,
     {
         let (zalsa, zalsa_local) = db.zalsas();
 

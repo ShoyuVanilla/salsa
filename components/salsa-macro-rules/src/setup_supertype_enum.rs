@@ -1,6 +1,6 @@
 /// Macro for setting up a function that must intern its arguments.
 #[macro_export]
-macro_rules! setup_input_struct {
+macro_rules! setup_supertype_enum{
     (
         // Attributes on the struct
         attrs: [$(#[$attr:meta]),*],
@@ -11,41 +11,11 @@ macro_rules! setup_input_struct {
         // Name of the struct
         Struct: $Struct:ident,
 
-        // Name user gave for `new`
-        new_fn: $new_fn:ident,
+        // Name of variants enum
+        Enum: $Enum:ident,
 
-        // A series of option tuples; see `setup_tracked_struct` macro
-        field_options: [$($field_option:tt),*],
-
-        // Field names
-        field_ids: [$($field_id:ident),*],
-
-        // Names for field getter methods (typically `foo`)
-        field_getters: [$($field_getter_vis:vis $field_getter_id:ident),*],
-
-        // Names for field setter methods (typically `set_foo`)
-        field_setters: [$($field_setter_vis:vis $field_setter_id:ident),*],
-
-        // Field types
-        field_tys: [$($field_ty:ty),*],
-
-        // Indices for each field from 0..N -- must be unsuffixed (e.g., `0`, `1`).
-        field_indices: [$($field_index:tt),*],
-
-        // Fields that are required (have no default value). Each item is the fields name and type.
-        required_fields: [$($required_field_id:ident $required_field_ty:ty),*],
-
-        // Names for the field durability methods on the builder (typically `foo_durability`)
-        field_durability_ids: [$($field_durability_id:ident),*],
-
-        // Number of fields
-        num_fields: $N:literal,
-
-        // If true, this is a singleton input.
-        is_singleton: $is_singleton:tt,
-
-        // If true, generate a debug impl.
-        generate_debug_impl: $generate_debug_impl:tt,
+        // Enum variant names and their field types
+        variants: [$(($variant:ident, $field_ty:ty)), *],
 
         // Annoyingly macro-rules hygiene does not extend to items defined in the macro.
         // We have the procedural macro generate names for those items that are
