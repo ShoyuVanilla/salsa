@@ -123,7 +123,15 @@ macro_rules! setup_input_struct {
                 }
             }
 
-            impl $zalsa::SalsaStructInDb for $Struct {
+            impl<'db> $zalsa::SalsaStruct<'db> for $Struct {
+                fn new(_db: &'db dyn $zalsa::Database,id: $zalsa::Id) -> Self {
+                    <Self as $zalsa::FromId>::from_id(id)
+                }
+
+                fn ingredient_index(db: &'db dyn $zalsa::Database) -> $zalsa::IngredientIndex {
+                    let ingredient = $Configuration::ingredient(db);
+                    $zalsa::Ingredient::ingredient_index(ingredient)
+                }
             }
 
             impl $Struct {

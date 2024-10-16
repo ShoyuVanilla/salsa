@@ -40,11 +40,12 @@ pub(crate) trait TablePage: Any + Send + Sync {
     ///
     /// The `current_revision` MUST be the current revision of the database owning this table page.
     unsafe fn syncs(&self, slot: SlotIndex, current_revision: Revision) -> &SyncTable;
+
+    fn ingredient(&self) -> IngredientIndex;
 }
 
 pub(crate) struct Page<T: Slot> {
     /// The ingredient for elements on this page.
-    #[allow(dead_code)] // pretty sure we'll need this
     ingredient: IngredientIndex,
 
     /// Number of elements of `data` that are initialized.
@@ -126,6 +127,12 @@ impl Table {
         let (page, slot) = split_id(id);
         let page_ref = self.page::<T>(page);
         page_ref.get_raw(slot)
+    }
+
+    pub fn get_ingredient(&self, id: Id) -> IngredientIndex {
+        let (page, _) = split_id(id);
+        let page = &self.pages[page.0];
+        page.ingredient()
     }
 
     /// Gets a reference to the page which has slots of type `T`
@@ -247,6 +254,10 @@ impl<T: Slot> TablePage for Page<T> {
 
     unsafe fn syncs(&self, slot: SlotIndex, current_revision: Revision) -> &SyncTable {
         self.get(slot).syncs(current_revision)
+    }
+
+    fn ingredient(&self) -> IngredientIndex {
+        self.ingredient
     }
 }
 

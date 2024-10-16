@@ -231,6 +231,10 @@ impl Zalsa {
         )
     }
 
+    pub fn get_ingredient(&self, id: Id) -> IngredientIndex {
+        self.table().get_ingredient(id)
+    }
+
     /// **NOT SEMVER STABLE**
     pub fn current_revision(&self) -> Revision {
         self.runtime.current_revision()

@@ -140,7 +140,17 @@ macro_rules! setup_interned_struct {
                 }
             }
 
-            impl $zalsa::SalsaStructInDb for $Struct<'_> {
+            impl<'db> $zalsa::SalsaStruct<'db> for $Struct<'db> {
+                fn new(db: &'db dyn $zalsa::Database, id: $zalsa::Id) -> Self {
+                    let new = <Self as $zalsa::FromId>::from_id(id);
+                    assert_eq!(db.zalsa().get_ingredient(new.0), Self::ingredient_index(db));
+                    new
+                }
+
+                fn ingredient_index(db: &'db dyn $zalsa::Database) -> $zalsa::IngredientIndex {
+                    let ingredient = $Configuration::ingredient(db);
+                    $zalsa::Ingredient::ingredient_index(ingredient)
+                }
             }
 
             unsafe impl $zalsa::Update for $Struct<'_> {

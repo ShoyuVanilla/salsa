@@ -30,6 +30,7 @@ mod input;
 mod interned;
 mod options;
 mod salsa_struct;
+mod supertype;
 mod tracked;
 mod tracked_fn;
 mod tracked_impl;

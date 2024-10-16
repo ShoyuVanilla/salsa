@@ -2,6 +2,9 @@ use std::fmt::Debug;
 use std::hash::Hash;
 use std::num::NonZeroU32;
 
+use crate::salsa_struct::SalsaStruct;
+use crate::Database;
+
 /// The `Id` of a salsa struct in the database [`Table`](`crate::table::Table`).
 ///
 /// The higher-order bits of an `Id` identify a [`Page`](`crate::table::Page`)
@@ -41,6 +44,15 @@ impl Id {
 
     pub const fn as_u32(self) -> u32 {
         self.value.get() - 1
+    }
+
+    pub fn is<'db, S: SalsaStruct<'db>>(self, db: &'db dyn Database) -> bool {
+        S::ingredient_index(db) == db.zalsa().table().get_ingredient(self)
+    }
+
+    pub fn downcast<'db, S: SalsaStruct<'db>>(self, db: &'db dyn Database) -> Option<S> {
+        self.is::<S>(db)
+            .then(|| <S as SalsaStruct<'db>>::new(db, self))
     }
 }
 
